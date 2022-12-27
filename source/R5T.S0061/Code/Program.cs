@@ -7,7 +7,7 @@ namespace R5T.S0061
     {
         static void Main()
         {
-            Console.WriteLine("Hello World!");
+            Operations.Instance.Run();
         }
     }
 }

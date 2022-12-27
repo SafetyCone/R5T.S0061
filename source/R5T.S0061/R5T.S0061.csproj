@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1587,1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <Version>1.0.0</Version>
@@ -15,4 +15,25 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/SafetyCone/R5T.S0061.git</RepositoryUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\davidcoats\D8S.Z0003.Private\source\D8S.Z0003\D8S.Z0003.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0000\source\R5T.F0000\R5T.F0000.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0017\source\R5T.F0017.F002\R5T.F0017.F002.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0018\source\R5T.F0018\R5T.F0018.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0027\source\R5T.F0027\R5T.F0027.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0032\source\R5T.F0032\R5T.F0032.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0035\source\R5T.F0035\R5T.F0035.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0040\source\R5T.F0040\R5T.F0040.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0052\source\R5T.F0052\R5T.F0052.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0082\source\R5T.F0082\R5T.F0082.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0097\source\R5T.F0097\R5T.F0097.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0098\source\R5T.F0098\R5T.F0098.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0006\source\R5T.Z0006\R5T.Z0006.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0010\source\R5T.Z0010\R5T.Z0010.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0012\source\R5T.Z0012\R5T.Z0012.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0022.Private\source\R5T.Z0022\R5T.Z0022.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0026\source\R5T.Z0026\R5T.Z0026.csproj" />
+    <ProjectReference Include="..\R5T.S0061.T001\R5T.S0061.T001.csproj" />
+    <ProjectReference Include="..\R5T.S0061.Z001\R5T.S0061.Z001.csproj" />
+  </ItemGroup>
 </Project>
