@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1573;1587;1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\R5T.F0026\source\R5T.F0026\R5T.F0026.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0034\source\R5T.F0034\R5T.F0034.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0035\source\R5T.F0035\R5T.F0035.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0096\source\R5T.F0096\R5T.F0096.csproj" />
+    <ProjectReference Include="..\..\..\R5T.L0028\source\R5T.L0028\R5T.L0028.csproj" />
+    <ProjectReference Include="..\..\..\R5T.L0029\source\R5T.L0029\R5T.L0029.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0017.Private\source\R5T.Z0017\R5T.Z0017.csproj" />
+    <ProjectReference Include="..\..\..\R5T.Z0024.Private\source\R5T.Z0024\R5T.Z0024.csproj" />
+  </ItemGroup>
+</Project>
