@@ -1,7 +1,7 @@
 using System;
 
 
-namespace R5T.S0061
+namespace R5T.S0061.F001
 {
     public class ReflectionOperations : IReflectionOperations
     {

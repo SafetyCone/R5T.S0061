@@ -6,9 +6,9 @@ using R5T.T0131;
 namespace R5T.S0061
 {
     [ValuesMarker]
-    public partial interface IFileNames : IValuesMarker
+    public partial interface IFileNames : IValuesMarker,
+        F001.IFileNames
     {
-        public string BuildJsonFileName => "R5T.S0061.Build.json";
         public string BuildProblemsTextFileName => "Build Problems.txt";
         public string BuildProblemProjectsTextFileName => "Build Problem Projects.txt";
         public string DateComparisonSummaryTextFilePath => "Summary-Date Comparison.txt";

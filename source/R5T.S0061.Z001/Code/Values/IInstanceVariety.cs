@@ -42,5 +42,8 @@ namespace R5T.S0061.Z001
 
         public string ServiceDefinitions => "Service Definitions";
         public string ServiceImplementations => "Service Implementations";
+
+        public string RazorComponents => "Razor Components";
+        public string DraftRazorComponents => "Razor Components-Draft";
     }
 }

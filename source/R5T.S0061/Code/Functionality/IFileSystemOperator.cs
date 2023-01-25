@@ -10,27 +10,8 @@ namespace R5T.S0061
 {
     [FunctionalityMarker]
     public partial interface IFileSystemOperator : IFunctionalityMarker,
-        F0000.IFileSystemOperator,
-        F0082.IFileSystemOperator
+        F001.IFileSystemOperator
     {
-        public bool Has_OutputAssembly(
-            string projectFilePath)
-        {
-            var assemblyFilePath = Instances.FilePathOperator.Get_PublishDirectoryOutputAssemblyFilePath(projectFilePath);
-
-            var outputAssemblyExists = Instances.FileSystemOperator.FileExists(assemblyFilePath);
-            return outputAssemblyExists;
-        }
-
-        public bool Has_BuildResultFile(
-            string projectFilePath)
-        {
-            var buildJsonFilePath = Instances.FilePathOperator.Get_BuildJsonFilePath(projectFilePath);
-
-            var buildJsonFileExists = Instances.FileSystemOperator.FileExists(buildJsonFilePath);
-            return buildJsonFileExists;
-        }
-
         public WasFound<BuildResult> Has_BuildResult(
             string projectFilePath)
         {
