@@ -6,7 +6,8 @@ using R5T.T0131;
 namespace R5T.S0061.S001
 {
     [ValuesMarker]
-    public partial interface IFilePaths : IValuesMarker
+    public partial interface IFilePaths : IValuesMarker,
+        Z0015.IFilePaths
     {
         public string BuildProblemProjectsTextFilePath => @"C:\Temp\Build Problem Projects.txt";
         public string BuildProblemsTextFilePath => @"C:\Temp\Build Problems.txt";

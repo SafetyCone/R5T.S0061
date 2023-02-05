@@ -8,8 +8,12 @@ namespace R5T.S0061.S001
         static void Main()
         {
             //Scripts.Instance.GetAllProjectFilePaths();
-            Scripts.Instance.BuildAllProjectFilePaths();
+            //Scripts.Instance.BuildAllProjectFilePaths();
             //Scripts.Instance.ProcessProjects();
+
+            //Scripts.Instance.SummarizeProcessingProblems();
+
+            Scripts.Instance.SearchInstances_NameContainsText();
         }
     }
 }

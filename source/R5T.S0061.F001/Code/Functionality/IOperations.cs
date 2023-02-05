@@ -17,6 +17,16 @@ namespace R5T.S0061.F001
     [FunctionalityMarker]
     public partial interface IOperations : IFunctionalityMarker
     {
+        /// <summary>
+        /// If the runtime directory is just the .NET Core runtime directory, then it should not be included (false).
+        /// Otherwise, if the runtime directory is the ASP.NET Core or the Windows Forms runtime directory, it should be included (true).
+        /// </summary>
+        public bool ShouldIncludeRuntimeDirectory(string runtimeDirectoryPath)
+        {
+            var output = runtimeDirectoryPath != Instances.RuntimeDirectoryPaths.NetCore;
+            return output;
+        }
+
         public string DetermineReflectionRuntimeDirectoryForProject(
             string projectFilePath)
         {
@@ -197,14 +207,10 @@ namespace R5T.S0061.F001
             string assemblyFilePath,
             string documentationForAssemblyFilePath)
         {
-            // Get the runtime to use for the project file path.
-            var runtimeDirectoryPath = this.DetermineReflectionRuntimeDirectoryForProject(
-                projectFilePath);
-
-            var instanceDescriptorsWithoutProjectFile = this.ProcessAssemblyFile_SpecifyRuntimeDirectoryPath(
+            var instanceDescriptorsWithoutProjectFile = this.ProcessAssemblyFile_AddRuntimeDirectoryPaths(
+                projectFilePath,
                 assemblyFilePath,
-                documentationForAssemblyFilePath,
-                runtimeDirectoryPath);
+                documentationForAssemblyFilePath);
 
             var output = instanceDescriptorsWithoutProjectFile
                 .Select(x =>
@@ -221,6 +227,33 @@ namespace R5T.S0061.F001
                     return instanceDescriptor;
                 })
                 .Now();
+
+            return output;
+        }
+
+        public T001.N001.InstanceDescriptor[] ProcessAssemblyFile_AddRuntimeDirectoryPaths(
+            string projectFilePath,
+            string assemblyFilePath,
+            string documentationForAssemblyFilePath)
+        {
+            var runtimeDirectoryPath = this.DetermineReflectionRuntimeDirectoryForProject(
+                projectFilePath);
+
+            var shouldIncludeRuntimeDirectoryPath = this.ShouldIncludeRuntimeDirectory(runtimeDirectoryPath);
+
+            var executingRuntimeDirectoryPath = Instances.ReflectionOperator.GetExecutingRuntimeDirectoryPath();
+
+            var runtimeDirectoryPaths = shouldIncludeRuntimeDirectoryPath
+                ? Instances.EnumerableOperator.From(
+                    executingRuntimeDirectoryPath,
+                    runtimeDirectoryPath)
+                : Instances.EnumerableOperator.From(executingRuntimeDirectoryPath)
+                ;
+
+            var output = this.ProcessAssemblyFile_SpecifyRuntimeDirectoryPaths(
+                assemblyFilePath,
+                documentationForAssemblyFilePath,
+                runtimeDirectoryPaths);
 
             return output;
         }
@@ -257,6 +290,70 @@ namespace R5T.S0061.F001
                     //Instances.RuntimeDirectoryPaths.AspNetCore);
                 },
                 runtimeDirectoryPath);
+
+            var output = instanceIdentityNameSetsByVarietyType
+                .SelectMany(pair =>
+                {
+                    var instanceVariety = pair.Key;
+
+                    var output = pair.Value
+                        .Select(x =>
+                        {
+                            var documentationXml = documentationByMemberIdentityName.HasValue(x.IdentityName)
+                                ? documentationByMemberIdentityName[x.IdentityName]
+                                : default
+                                ;
+
+                            var output = new T001.N001.InstanceDescriptor
+                            {
+                                InstanceVariety = instanceVariety,
+                                IdentityName = x.IdentityName,
+                                ParameterNamedIdentityName = x.ParameterNamedIdentityName,
+                                DescriptionXml = documentationXml,
+                            };
+
+                            return output;
+                        });
+
+                    return output;
+                })
+                .Now();
+
+            return output;
+        }
+
+        public T001.N001.InstanceDescriptor[] ProcessAssemblyFile_SpecifyRuntimeDirectoryPaths(
+            string assemblyFilePath,
+            string documentationForAssemblyFilePath,
+            IEnumerable<string> runtimeDirectoryPaths)
+        {
+            var documentationByMemberIdentityName = Instances.DocumentationOperations.GetDocumentationByMemberIdentityName(
+                documentationForAssemblyFilePath);
+
+            var intanceIdentityNamesProvidersByInstanceVariety = Operations.Instance.GetInstanceIdentityNamesProvidersByInstanceVariety();
+
+            var instanceIdentityNameSetsByVarietyType = Instances.ReflectionOperator.InAssemblyContext(
+                assemblyFilePath,
+                assembly =>
+                {
+                    var output = intanceIdentityNamesProvidersByInstanceVariety
+                        .Select(pair =>
+                        {
+                            var instanceIdentityNamesSet = pair.Value(assembly);
+
+                            return (pair.Key, instanceIdentityNamesSet);
+                        })
+                        .ToDictionary(
+                            x => x.Key,
+                            x => x.instanceIdentityNamesSet);
+
+                    return output;
+                    //});
+                    //},
+                    //// For now, always include the ASP.NET Core runtime.
+                    //Instances.RuntimeDirectoryPaths.AspNetCore);
+                },
+                runtimeDirectoryPaths);
 
             var output = instanceIdentityNameSetsByVarietyType
                 .SelectMany(pair =>
