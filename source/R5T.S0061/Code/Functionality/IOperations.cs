@@ -12,7 +12,7 @@ using R5T.F0000;
 using R5T.T0132;
 
 using R5T.S0061.T001;
-
+using System.Threading.Tasks;
 
 namespace R5T.S0061
 {
@@ -20,7 +20,7 @@ namespace R5T.S0061
     public partial interface IOperations : IFunctionalityMarker,
         F001.IOperations
     {
-        public void Run()
+        public async Task Run()
         {
             /// Inputs.
             var date = Instances.NowOperator.GetToday();
@@ -29,15 +29,15 @@ namespace R5T.S0061
 
 
             /// Run.
-            Instances.LoggingOperator.InConsoleLoggerContext_Synchronous(
+            await Instances.LoggingOperator.InConsoleLoggerContext(
                 Instances.Values.ApplicationName,
-                logger =>
+                async logger =>
                 {
                     var projectsListTextFilePath = this.GetAllProjectFilePaths(
                         date,
                         logger);
 
-                    var (buildProblemsFilePath, buildProblemProjectsFilePath) = this.BuildProjectFilePaths(
+                    var (buildProblemsFilePath, buildProblemProjectsFilePath) = await this.BuildProjectFilePaths(
                         date,
                         logger,
                         rebuildFailedBuildsToCollectErrors,
@@ -568,7 +568,7 @@ namespace R5T.S0061
                 .Except(buildProblemProjectFilePaths)
                 .Now();
 
-            var projectFileTuples = this.CreateProjectFilesTuples(buildProblemProjectFilePaths);
+            var projectFileTuples = this.CreateProjectFilesTuples(buildSuccessProjectFilePaths);
 
             // Write project file tuples file.
             var projectFileTuplesJsonFilePath = Instances.FilePathOperator.Get_ProjectFileTuplesJsonFilePath(datedOutputDirectoryPath);
@@ -580,7 +580,7 @@ namespace R5T.S0061
             return projectFileTuplesJsonFilePath;
         }
 
-        public (string buildProblemsFilePath, string buildProblemProjectsFilePath) BuildProjectFilePaths(
+        public async Task<(string buildProblemsFilePath, string buildProblemProjectsFilePath)> BuildProjectFilePaths(
             DateTime date,
             ILogger logger,
             bool rebuildFailedBuildsToCollectErrors,
@@ -593,11 +593,12 @@ namespace R5T.S0061
 
             var projectFilePaths = Instances.FileOperator.ReadAllLines_Synchronous(projectsListTextFilePath);
 
-            this.BuildProjectFilePaths(
+            await this.BuildProjectFilePaths(
                 rebuildFailedBuildsToCollectErrors,
                 projectFilePaths,
                 buildProblemsFilePath,
                 buildProblemProjectsFilePath,
+                new HashSet<string>(),
                 logger);
 
             return (buildProblemsFilePath, buildProblemProjectsFilePath);

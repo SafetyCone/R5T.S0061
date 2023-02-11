@@ -18,10 +18,24 @@ namespace R5T.S0061.F002
             return name;
         }
 
+        public bool InstanceNameContainsText(string instanceName, string searchTerm, StringComparison stringComparison)
+        {
+            var output = instanceName.Contains(searchTerm, stringComparison);
+            return output;
+        }
+
         public bool InstanceNameContainsText(string instanceName, string searchTerm)
         {
             var output = instanceName.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant());
             return output;
+        }
+
+        public bool InstanceNameContainsText(InstanceDescriptor instance, string searchTerm, StringComparison stringComparison)
+        {
+            var instanceName = this.GetInstanceName(instance);
+
+            var containsSearchTerm = this.InstanceNameContainsText(instanceName, searchTerm, stringComparison);
+            return containsSearchTerm;
         }
 
         public bool InstanceNameContainsText(InstanceDescriptor instance, string searchTerm)
@@ -30,6 +44,15 @@ namespace R5T.S0061.F002
 
             var containsSearchTerm = this.InstanceNameContainsText(instanceName, searchTerm);
             return containsSearchTerm;
+        }
+
+        public IEnumerable<InstanceDescriptor> InstanceNameContainsText(IEnumerable<InstanceDescriptor> instances, string searchTerm, StringComparison stringComparison)
+        {
+            var output = instances
+                .Where(instance => this.InstanceNameContainsText(instance, searchTerm, stringComparison))
+                ;
+
+            return output;
         }
 
         public IEnumerable<InstanceDescriptor> InstanceNameContainsText(IEnumerable<InstanceDescriptor> instances, string searchTerm)

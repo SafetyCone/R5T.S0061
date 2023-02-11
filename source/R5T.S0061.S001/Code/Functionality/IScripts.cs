@@ -5,13 +5,81 @@ using System.Linq;
 using R5T.T0132;
 
 using R5T.S0061.T001;
-
+using System.Threading.Tasks;
 
 namespace R5T.S0061.S001
 {
     [FunctionalityMarker]
     public partial interface IScripts : IFunctionalityMarker
     {
+        public void SearchFunctionality_NameContainsText_Categorize()
+        {
+            /// Inputs.
+            var searchText = ExampleSearchTerms.Instance.Deploy;
+            var includeDraft = true;
+            var matchCase = false;
+
+            var instancesJsonFilePath = Instances.FilePaths.InstancesJsonFilePath;
+
+
+            /// Run.
+            var instances = Instances.Operations.LoadInstances_Synchronous(instancesJsonFilePath);
+
+            // Get functionalities, and draft functionalities if desired.
+            var functionalityInstances = instances
+                .Transform(instances =>
+                    Instances.InstanceOperations.WhereIsFunctionality(
+                        instances, includeDraft))
+                .Now();
+
+            // Determine instances containing text.
+            var stringComparision = matchCase
+                ? StringComparison.InvariantCulture
+                : StringComparison.InvariantCultureIgnoreCase
+                ;
+
+            var instancesContainingText = functionalityInstances
+                .Where(instance =>
+                {
+                    // Instance name.
+                    var instanceNameContainstext = Instances.Operations.InstanceNameContainsText(
+                        instance,
+                        searchText,
+                        stringComparision);
+
+                    // Project name.
+                    var projectNameContainsText = instance.ProjectFilePath.Contains(searchText, stringComparision);
+
+                    // Wait on comments, until I can create functionality to convert the HTML into text.
+
+                    var output = false
+                        || instanceNameContainstext
+                        || projectNameContainsText
+                        ;
+
+                    return output;
+                })
+                .Now();
+
+            // Categorize.
+            //var instancesByCategory = instancesContainingText
+            //    // SelectMany since an instance might have text in multiple categories.
+            //    .SelectMany(instance =>
+            //    {
+
+            //    })
+            //    ;
+
+
+            // Output
+            Instances.JsonOperator.Serialize_Synchronous(
+                Instances.FilePaths.OutputJsonFilePath,
+                instancesContainingText);
+
+            Instances.NotepadPlusPlusOperator.Open(
+                Instances.FilePaths.OutputJsonFilePath);
+        }
+
         public void SearchInstances_NameContainsText()
         {
             /// Inputs.
@@ -152,30 +220,36 @@ namespace R5T.S0061.S001
         /// <summary>
         /// Given a list of projects, try to build each project and collect all problems while building.
         /// </summary>
-        public void BuildAllProjectFilePaths()
+        public async Task BuildAllProjectFilePaths()
         {
             /// Inputs.
             var rebuildFailedBuildsToCollectErrors = true;
             var projectFilePaths =
-                Instances.FileOperator.ReadAllLines_Synchronous(
-                    Instances.FilePaths.ProjectsListTextFilePath)
-                //Instances.ArrayOperator.From(
-                //    //@"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.E0064\source\R5T.E0064.W001\R5T.E0064.W001.csproj")
-                //    //@"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.R0003\source\R5T.R0003\R5T.R0003.csproj")
-                //    @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.F0062\source\R5T.F0062\R5T.F0062.csproj")
-                ;
+            //Instances.FileOperator.ReadAllLines_Synchronous(
+            //    Instances.FilePaths.ProjectsListTextFilePath)
+            Instances.ArrayOperator.From(
+                //@"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.E0064\source\R5T.E0064.W001\R5T.E0064.W001.csproj")
+                //@"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.R0003\source\R5T.R0003\R5T.R0003.csproj")
+                @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.NetStandard.Configuration\source\R5T.NetStandard.Configuration\R5T.NetStandard.Configuration.csproj")
+            ;
 
 
             /// Run.
-            Instances.LoggingOperator.InConsoleLoggerContext_Synchronous(
+            var projectFilePathsToSkip = Instances.FileOperator.ReadAllLines_Synchronous(
+               Instances.FilePaths.DoNotBuildProjectsTextFilePath);
+
+            var projectFilePathsToSkipHash = new HashSet<string>(projectFilePathsToSkip);
+
+            await Instances.LoggingOperator.InConsoleLoggerContext(
                 nameof(BuildAllProjectFilePaths),
-                logger =>
+                async logger =>
                 {
-                    Instances.Operations.BuildProjectFilePaths(
+                    await Instances.Operations.BuildProjectFilePaths(
                         rebuildFailedBuildsToCollectErrors,
                         projectFilePaths,
                         Instances.FilePaths.BuildProblemsTextFilePath,
                         Instances.FilePaths.BuildProblemProjectsTextFilePath,
+                        projectFilePathsToSkipHash,
                         logger);
                 });
 

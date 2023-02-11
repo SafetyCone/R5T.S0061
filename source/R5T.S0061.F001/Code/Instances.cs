@@ -10,7 +10,7 @@ namespace R5T.S0061.F001
         public static Z0012.IDirectoryNames DirectoryNames => Z0012.DirectoryNames.Instance;
         public static IDirectoryPathOperator DirectoryPathOperator => F001.DirectoryPathOperator.Instance;
         public static F0099.IDocumentationOperations DocumentationOperations => F0099.DocumentationOperations.Instance;
-        public static F0027.IDotnetPublishOperator DotnetPublishOperator => F0027.DotnetPublishOperator.Instance;
+        //public static F0027.IDotnetPublishOperator DotnetPublishOperator => F0027.DotnetPublishOperator.Instance;
         public static F0000.IEnumerableOperator EnumerableOperator => F0000.EnumerableOperator.Instance;
         public static Z0010.IFileExtensions FileExtensions => Z0010.FileExtensions.Instance;
         public static IFileNames FileNames => F001.FileNames.Instance;
@@ -30,6 +30,7 @@ namespace R5T.S0061.F001
         public static IProjectPathsOperator ProjectPathsOperator => F001.ProjectPathsOperator.Instance;
         public static F0020.IProjectXmlOperations ProjectXmlOperations => F0020.ProjectXmlOperations.Instance;
         public static F0020.IProjectXmlOperator ProjectXmlOperator => F0020.ProjectXmlOperator.Instance;
+        public static F0077.IPublishOperator PublishOperator => F0077.PublishOperator.Instance;
         public static IReflectionOperations ReflectionOperations => F001.ReflectionOperations.Instance;
         public static F0018.IReflectionOperator ReflectionOperator => F0018.ReflectionOperator.Instance;
         public static Z0022.IRepositoriesDirectoryPaths RepositoriesDirectoryPaths => Z0022.RepositoriesDirectoryPaths.Instance;

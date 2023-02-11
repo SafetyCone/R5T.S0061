@@ -1,13 +1,14 @@
 using System;
+using System.Threading.Tasks;
 
 
 namespace R5T.S0061
 {
     class Program
     {
-        static void Main()
+        static async Task Main()
         {
-            Operations.Instance.Run();
+            await Operations.Instance.Run();
         }
     }
 }

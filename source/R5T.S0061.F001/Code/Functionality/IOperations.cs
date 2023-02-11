@@ -10,7 +10,7 @@ using System.Extensions;
 using R5T.T0132;
 
 using R5T.S0061.T001;
-
+using System.Threading.Tasks;
 
 namespace R5T.S0061.F001
 {
@@ -470,11 +470,12 @@ namespace R5T.S0061.F001
                 instances.ToArray());
         }
 
-        public Dictionary<string, string> BuildProjectFilePaths(
+        public async Task<Dictionary<string, string>> BuildProjectFilePaths(
             bool rebuildFailedBuildsToCollectErrors,
             IList<string> projectFilePaths,
             string buildProblemsFilePath,
             string buildProblemProjectsFilePath,
+            HashSet<string> projectFilePathsToSkip,
             ILogger logger)
         {
             var buildProblemTextsByProjectFilePath = new Dictionary<string, string>();
@@ -492,18 +493,29 @@ namespace R5T.S0061.F001
                 var shouldBuildProject = this.ShouldBuildProject(
                     projectFilePath,
                     rebuildFailedBuildsToCollectErrors,
+                    projectFilePathsToSkip,
                     logger);
 
                 if (shouldBuildProject)
                 {
                     // Clear the publish directory and publish (build), and not any problems.
-                    this.BuildProject(
+                    await this.BuildProject(
                         projectFilePath,
                         logger,
                         buildProblemTextsByProjectFilePath);
                 }
                 else
                 {
+                    // Is project on the skip list?
+                    if(projectFilePathsToSkip.Contains(projectFilePath))
+                    {
+                        buildProblemTextsByProjectFilePath.Add(
+                            projectFilePath,
+                            "Project is on skip list.");
+
+                        continue;
+                    }
+
                     // See if a prior attempt to build the project failed, and not the failure.
                     var hasOutputAssembly = Instances.FileSystemOperator.Has_OutputAssembly(projectFilePath);
                     if (!hasOutputAssembly)
@@ -523,7 +535,7 @@ namespace R5T.S0061.F001
                 buildProblemTextsByProjectFilePath);
 
             // Write build problem projects file.
-            Instances.FileOperator.WriteLines(
+            await Instances.FileOperator.WriteLines(
                 buildProblemProjectsFilePath,
                 buildProblemTextsByProjectFilePath.Keys
                     .OrderAlphabetically());
@@ -535,7 +547,7 @@ namespace R5T.S0061.F001
         /// Builds the project with the win-x64 runtime argument to get a self-contained executable.
         /// (To allow full assembly reflection.)
         /// </summary>
-        public void BuildProject(
+        public async Task BuildProject(
             string projectFilePath,
             ILogger logger)
         {
@@ -552,21 +564,21 @@ namespace R5T.S0061.F001
             // Instead, use the regular publish operation for HD space.
             // Not sure what to do in the reflection step. I have tried:
             // 1. Adding a framework reference in the CSPROJ file of the executable doing the reflection.
-            Instances.DotnetPublishOperator.Publish(
+            await Instances.PublishOperator.Publish(
                 projectFilePath,
                 publishDirectoryPath);
 
             logger.LogInformation("Built project.");
         }
 
-        public void BuildProject(
+        public async Task BuildProject(
             string projectFilePath,
             ILogger logger,
             Dictionary<string, string> buildProblemTextsByProjectFilePath)
         {
             try
             {
-                this.BuildProject(
+                await this.BuildProject(
                     projectFilePath,
                     logger);
             }
@@ -603,9 +615,17 @@ namespace R5T.S0061.F001
         public bool ShouldBuildProject(
             string projectFilePath,
             bool rebuildFailedBuildsToCollectErrors,
+            HashSet<string> projectFilePathsToSkip,
             ILogger logger)
         {
             logger.LogInformation("Determining whether the project should be built:\n\t{projectFilePath}", projectFilePath);
+
+            if(projectFilePathsToSkip.Contains(projectFilePath))
+            {
+                logger.LogInformation("Project is on skip list.");
+
+                return false;
+            }
 
             var neverBuiltBefore = this.ShouldBuildProject_NeverBuiltBefore(
                 projectFilePath,
