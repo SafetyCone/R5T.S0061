@@ -42,5 +42,50 @@ namespace R5T.S0061.F001
 
             return assemblyFilePath;
         }
+
+        public string Get_PublishWwwRootFrameworkDirectoryOutputAssemblyFilePath(
+            string projectFilePath)
+        {
+            var publishDirectoryPath = Instances.DirectoryPathOperator.GetPublishDirectoryPath_ForProjectFilePath(projectFilePath);
+
+            var wwwRootDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+                publishDirectoryPath,
+                Instances.DirectoryNames.WwwRoot);
+
+            var frameworkDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+                wwwRootDirectoryPath,
+                Instances.DirectoryNames.Framework);
+
+            var projectName = Instances.ProjectPathsOperator.GetProjectName(projectFilePath);
+
+            var outputAssemblyFileName = F0000.FileNameOperator.Instance.GetFileName(
+                projectName,
+                Instances.FileExtensions.Dll);
+
+            var assemblyFilePath = Instances.PathOperator.GetFilePath(
+                frameworkDirectoryPath,
+                outputAssemblyFileName);
+
+            return assemblyFilePath;
+        }
+
+        public string Get_ReleaseDocumentationFilePath(
+            string projectFilePath)
+        {
+            var projectDirectoryPath = F0052.ProjectPathsOperator.Instance.GetProjectDirectoryPath(projectFilePath);
+
+            var releaseDirectoryPath = F0002.PathOperator.Instance.GetDirectoryPath(
+                projectDirectoryPath,
+                Instances.DirectoryNames.bin,
+                Instances.DirectoryNames.Release);
+
+            var documentationFileName = Instances.ProjectPathsOperator.GetDocumentationFileName_FromProjectFilePath(projectFilePath);
+
+            var documentationFilePath = Instances.PathOperator.GetFilePath(
+                releaseDirectoryPath,
+                documentationFileName);
+
+            return documentationFilePath;
+        }
     }
 }
