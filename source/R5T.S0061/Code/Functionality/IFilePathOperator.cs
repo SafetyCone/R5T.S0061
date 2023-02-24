@@ -119,12 +119,24 @@ namespace R5T.S0061
             return buildProblemsFilePath;
         }
 
+        /// <inheritdoc cref="IFileNames.ProjectsListTextFileName"/>
         public string Get_ProjectsListTextFilePath(
             string datedOutputDirectoryPath)
         {
             var projectsListTextFilePath = Instances.PathOperator.GetFilePath(
                 datedOutputDirectoryPath,
                 Instances.FileNames.ProjectsListTextFileName);
+
+            return projectsListTextFilePath;
+        }
+
+        /// <inheritdoc cref="IFileNames.ProjectsList_AllTextFileName"/>
+        public string Get_ProjectsList_AllTextFilePath(
+            string datedOutputDirectoryPath)
+        {
+            var projectsListTextFilePath = Instances.PathOperator.GetFilePath(
+                datedOutputDirectoryPath,
+                Instances.FileNames.ProjectsList_AllTextFileName);
 
             return projectsListTextFilePath;
         }

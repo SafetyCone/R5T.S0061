@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
-
-using System.Extensions;
 
 using R5T.F0000;
 using R5T.T0132;
 
 using R5T.S0061.T001;
-using System.Threading.Tasks;
+
 
 namespace R5T.S0061
 {
@@ -29,16 +28,18 @@ namespace R5T.S0061
 
 
             /// Run.
+            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
+
             await Instances.LoggingOperator.InConsoleLoggerContext(
                 Instances.Values.ApplicationName,
                 async logger =>
                 {
                     var projectsListTextFilePath = this.GetAllProjectFilePaths(
-                        date,
+                        datedOutputDirectoryPath,
                         logger);
 
                     var (buildProblemsFilePath, buildProblemProjectsFilePath) = await this.BuildProjectFilePaths(
-                        date,
+                        datedOutputDirectoryPath,
                         logger,
                         rebuildFailedBuildsToCollectErrors,
                         projectsListTextFilePath);
@@ -47,12 +48,12 @@ namespace R5T.S0061
                     Thread.Sleep(1000);
 
                     var projectFileTuplesJsonFilePath = this.CreateProjectFileTuples(
-                        date,
+                        datedOutputDirectoryPath,
                         projectsListTextFilePath,
                         buildProblemProjectsFilePath);
 
-                    var (processingProblemsFilePath, processingProblemProjectsFilePath, instancesJsonFilePath) = this.ProcessBuiltProjects(
-                        date,
+                    var (processingProblemsFilePath, processingProblemProjectsFilePath, instancesJsonFilePath) = await this.ProcessBuiltProjects(
+                        datedOutputDirectoryPath,
                         logger);
 
                     // Wait a second for file handles to be released.
@@ -93,7 +94,7 @@ namespace R5T.S0061
                         dateComparisonSummaryTextFilePath,
                         processingSummaryFilePath);
 
-                    this.OutputInstanceSpecificFiles(
+                    Instances.OutputOperations.OutputInstanceSpecificFiles(
                         instancesJsonFilePath);
 
                     this.CopyFilesToCloudSharedDirectory(date);
@@ -125,58 +126,6 @@ namespace R5T.S0061
             }
         }
 
-        public void OutputInstanceSpecificFiles(
-            string instancesJsonFilePath)
-        {
-            /// Inputs.
-            var date = Instances.NowOperator.GetToday();
-
-
-            /// Run.
-            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
-
-            var instances = Instances.JsonOperator.Deserialize_Synchronous<InstanceDescriptor[]>(instancesJsonFilePath);
-            var instancesByVariety = instances
-                .GroupBy(x => x.InstanceVariety)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.ToArray());
-
-            var instanceVarietyNames = Instances.InstanceVarietyOperator.GetAllInstanceVarietyNames_InPresentationOrder();
-
-            foreach (var instanceVarietyName in instanceVarietyNames)
-            {
-                var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
-
-                var outputFilePath = Instances.PathOperator.GetFilePath(
-                    datedOutputDirectoryPath,
-                    fileName);
-
-                var instancesOfVariety = instancesByVariety.ContainsKey(instanceVarietyName)
-                    ? instancesByVariety[instanceVarietyName]
-                    : Array.Empty<InstanceDescriptor>()
-                    ;
-
-                var title = instanceVarietyName;
-
-                var lines = Instances.EnumerableOperator.From($"{title}, Count: {instancesOfVariety.Length}\n\n")
-                    .Append(instancesOfVariety
-                        .GroupBy(x => x.ProjectFilePath)
-                        .OrderAlphabetically(x => x.Key)
-                        .SelectMany(xGroup => Instances.EnumerableOperator.From($"{xGroup.Key}:")
-                            .Append(xGroup
-                                // Order by the identity name.
-                                .OrderAlphabetically(x => x.IdentityName)
-                                // But output the parameter named identity name.
-                                .Select(x => $"\t{x.ParameterNamedIdentityName}")
-                                .Append(Instances.Strings.Empty))));
-
-                Instances.FileOperator.WriteAllLines_Synchronous(
-                    outputFilePath,
-                    lines);
-            }
-        }
-
         public void SendResultsEmail(
             string newAndOldSummaryFilePath,
             string dateComparisonSummaryFilePath,
@@ -190,7 +139,7 @@ namespace R5T.S0061
             var toAddresses = new[]
             {
                 Instances.EmailAddresses.David_Gmail,
-                Instances.EmailAddresses.Vedika_Gmail,
+                //Instances.EmailAddresses.Vedika_Gmail,
             };
 
             var today = Instances.DateOperator.GetToday();
@@ -482,20 +431,18 @@ namespace R5T.S0061
             return processingSummaryFilePath;
         }
 
-        public (
+        public async Task<(
             string processingProblemsFilePath,
             string processingProblemProjectsFilePath,
-            string instancesJsonFilePath)
+            string instancesJsonFilePath)>
             ProcessBuiltProjects(
-            DateTime date,
+            string datedOutputDirectoryPath,
             ILogger logger)
         {
             /// Run.
-            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
-
             var projectFileTuplesJsonFilePath = Instances.FilePathOperator.Get_ProjectFileTuplesJsonFilePath(datedOutputDirectoryPath);
 
-            var projectFileTuples = Instances.JsonOperator.Deserialize_Synchronous<ProjectFilesTuple[]>(
+            var projectFileTuples = Instances.JsonOperator.Deserialize_Synchronous<ProjectFileTuple[]>(
                 projectFileTuplesJsonFilePath);
 
             var processingProblemsFilePath = Instances.FilePathOperator.Get_ProcessingProblemsTextFilePath(datedOutputDirectoryPath);
@@ -503,12 +450,19 @@ namespace R5T.S0061
 
             var instancesJsonFilePath = Instances.FilePathOperator.Get_InstancesJsonFilePath(datedOutputDirectoryPath);
 
-            this.ProcessBuiltProjects(
-                projectFileTuples,
-                processingProblemsFilePath,
-                processingProblemProjectsFilePath,
-                instancesJsonFilePath,
-                logger);
+            await Instances.TextOutputOperator.InTextOutputContext(
+                Instances.HumanOutputTextFilePathOperator.GetHumanOutputTextFilePath,
+                nameof(BuildProjectFilePaths),
+                Instances.LogFilePathOperator.GetLogFilePath,
+                async textOutput =>
+                {
+                    await this.ProcessBuiltProjects(
+                        projectFileTuples,
+                        processingProblemsFilePath,
+                        processingProblemProjectsFilePath,
+                        instancesJsonFilePath,
+                        textOutput);
+                });
 
             return (
                 processingProblemsFilePath,
@@ -554,13 +508,11 @@ namespace R5T.S0061
         }
 
         public string CreateProjectFileTuples(
-            DateTime date,
+            string datedOutputDirectoryPath,
             string projectsListTextFilePath,
             string buildProblemProjectsFilePath)
         {
             /// Run.
-            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
-
             var projectFilePaths = Instances.FileOperator.ReadAllLines_Synchronous(projectsListTextFilePath);
             var buildProblemProjectFilePaths = Instances.FileOperator.ReadAllLines_Synchronous(buildProblemProjectsFilePath);
 
@@ -581,46 +533,61 @@ namespace R5T.S0061
         }
 
         public async Task<(string buildProblemsFilePath, string buildProblemProjectsFilePath)> BuildProjectFilePaths(
-            DateTime date,
+            string datedOutputDirectoryPath,
             ILogger logger,
             bool rebuildFailedBuildsToCollectErrors,
             string projectsListTextFilePath)
         {
-            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
-
             var buildProblemsFilePath = Instances.FilePathOperator.Get_BuildProblemsTextFilePath(datedOutputDirectoryPath);
             var buildProblemProjectsFilePath = Instances.FilePathOperator.Get_BuildProblemProjectsTextFilePath(datedOutputDirectoryPath);
 
             var projectFilePaths = Instances.FileOperator.ReadAllLines_Synchronous(projectsListTextFilePath);
 
-            await this.BuildProjectFilePaths(
-                rebuildFailedBuildsToCollectErrors,
-                projectFilePaths,
-                buildProblemsFilePath,
-                buildProblemProjectsFilePath,
-                new HashSet<string>(),
-                logger);
+            await Instances.TextOutputOperator.InTextOutputContext(
+                Instances.HumanOutputTextFilePathOperator.GetHumanOutputTextFilePath,
+                nameof(BuildProjectFilePaths),
+                Instances.LogFilePathOperator.GetLogFilePath,
+                async textOutput =>
+                {
+                    await this.BuildProjectFilePaths(
+                        rebuildFailedBuildsToCollectErrors,
+                        projectFilePaths,
+                        buildProblemsFilePath,
+                        buildProblemProjectsFilePath,
+                        textOutput);
+                });
 
             return (buildProblemsFilePath, buildProblemProjectsFilePath);
         }
 
         /// <summary>
-        /// Searches the file-system in each of the repositories directory paths.
+        /// <inheritdoc cref="F001.Documentation.GetAllProjectFilePaths"/>
+        /// Also removes project files that should not be built.
         /// </summary>
         /// <returns>The projects list text file path.</returns>
         public string GetAllProjectFilePaths(
-            DateTime date,
+            string datedOutputDirectoryPath,
             ILogger logger)
         {
-            var datedOutputDirectoryPath = Instances.DirectoryPathOperator.Get_DatedOutputDirectoryPath(date);
-
             // Output project paths to current run date's directory.
             var projectsListTextFilePath = Instances.FilePathOperator.Get_ProjectsListTextFilePath(
                 datedOutputDirectoryPath);
 
-            this.GetAllProjectFilePaths(
-                projectsListTextFilePath,
-                logger);
+            Instances.TextOutputOperator.InTextOutputContext_Synchronous(
+                Instances.HumanOutputTextFilePathOperator.GetHumanOutputTextFilePath,
+                nameof(BuildProjectFilePaths),
+                Instances.LogFilePathOperator.GetLogFilePath,
+                textOutput =>
+                {
+                    var projectsList_AllTextFilePath = Instances.FilePathOperator.Get_ProjectsList_AllTextFilePath(
+                        datedOutputDirectoryPath);
+
+                    this.GetAllProjectFilePaths(
+                        projectsList_AllTextFilePath,
+                        projectsListTextFilePath,
+                        Instances.FilePaths.DoNotBuildProjectsListTextFilePath,
+                        textOutput);
+                });
 
             return projectsListTextFilePath;
         }

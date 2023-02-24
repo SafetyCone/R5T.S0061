@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using System.Extensions;
 
 using R5T.T0132;
+using R5T.T0159;
+using R5T.T0159.Extensions;
 
 using R5T.S0061.T001;
 
@@ -316,8 +318,6 @@ namespace R5T.S0061.F001
             return Internal;
         }
 
-
-
         public Func<Assembly, InstanceIdentityNames[]> GetInstanceMethodNamesProviderFunction(
             string markerAttributeNamespacedTypeName)
         {
@@ -361,13 +361,15 @@ namespace R5T.S0061.F001
             string projectFilePath,
             string assemblyFilePath,
             string documentationForAssemblyFilePath,
-            ProjectDependenciesSet projectDependenciesSet)
+            ProjectDependenciesSet projectDependenciesSet,
+            DotnetRuntimeDirectoryPaths dotnetRuntimeDirectoryPaths)
         {
             var instanceDescriptorsWithoutProjectFile = this.ProcessAssemblyFile_AddRuntimeDirectoryPaths(
                 projectFilePath,
                 assemblyFilePath,
                 documentationForAssemblyFilePath,
-                projectDependenciesSet);
+                projectDependenciesSet,
+                dotnetRuntimeDirectoryPaths);
 
             var output = instanceDescriptorsWithoutProjectFile
                 .Select(x =>
@@ -392,7 +394,8 @@ namespace R5T.S0061.F001
             string projectFilePath,
             string assemblyFilePath,
             string documentationForAssemblyFilePath,
-            ProjectDependenciesSet projectDependenciesSet)
+            ProjectDependenciesSet projectDependenciesSet,
+            DotnetRuntimeDirectoryPaths dotnetRuntimeDirectoryPaths)
         {
             var runtimeDirectoryPaths = Instances.EnumerableOperator.Empty<string>();
 
@@ -403,10 +406,8 @@ namespace R5T.S0061.F001
                     var shouldIncludeCoreRuntimeDirectory = this.ShouldIncludeCoreRuntimeDirectory(projectElement);
                     if (shouldIncludeCoreRuntimeDirectory)
                     {
-                        var coreRuntimeDirectory = this.DetermineCoreRuntimeDirectoryForProject(projectElement);
-
                         runtimeDirectoryPaths = runtimeDirectoryPaths
-                            .Append(coreRuntimeDirectory)
+                            .Append(dotnetRuntimeDirectoryPaths.NetCoreApp)
                             ;
                     }
 
@@ -417,20 +418,16 @@ namespace R5T.S0061.F001
 
                     if (shouldIncludeAspNetRuntimeDirectoryPath)
                     {
-                        var aspNetCoreDirectory = this.DetermineAspNetReflectionRuntimeDirectoryForProject(projectElement);
-
                         runtimeDirectoryPaths = runtimeDirectoryPaths
-                            .Append(aspNetCoreDirectory)
+                            .Append(dotnetRuntimeDirectoryPaths.AspNetCoreApp)
                             ;
                     }
 
                     var shouldIncludeWindowsRuntime = this.ShouldIncludeWindowsRuntimeDirectory(projectElement);
                     if(shouldIncludeWindowsRuntime)
                     {
-                        var windowsDirectory = this.DetermineWindowsReflectionRuntimeDirectoryForProject(projectElement);
-
                         runtimeDirectoryPaths = runtimeDirectoryPaths
-                            .Append(windowsDirectory)
+                            .Append(dotnetRuntimeDirectoryPaths.WindowsDesktopApp)
                             ;
                     }
                 });
@@ -574,11 +571,11 @@ namespace R5T.S0061.F001
         public async Task<InstanceDescriptor[]> ProcessBuiltProjects(
             IList<ProjectFileTuple> projectFileTuples,
             Func<IDictionary<string, string>, Task> processingProblemsConsumer,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var (processingProblemTextsByProjectFilePath, instances) = await this.ProcessBuiltProjects(
                 projectFileTuples,
-                logger);
+                textOutput);
 
             await processingProblemsConsumer(processingProblemTextsByProjectFilePath);
 
@@ -605,7 +602,7 @@ namespace R5T.S0061.F001
             string processingProblemsTextFilePath,
             string processingProblemProjectsTextFilePath,
             string instancesJsonFilePath,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var instances = await this.ProcessBuiltProjects(
                 projectFileTuples,
@@ -618,7 +615,7 @@ namespace R5T.S0061.F001
 
                     return Task.CompletedTask;
                 },
-                logger);
+                textOutput);
 
             await Instances.JsonOperator.Serialize(
                instancesJsonFilePath,
@@ -630,7 +627,7 @@ namespace R5T.S0061.F001
             InstanceDescriptor[] instances)>
             ProcessBuiltProjects(
             IList<ProjectFileTuple> projectFileTuples,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var projectDependenciesSet = new ProjectDependenciesSet();
 
@@ -641,9 +638,13 @@ namespace R5T.S0061.F001
             var projectCounter = 1; // Start at 1.
             var projectCount = projectFileTuples.Count;
 
+            // Get the current latest runtime directory paths.
+            var dotnetRuntimeDirectoryPaths = Instances.RuntimeDirectoryPathOperator.GetDotnetRuntimeDirectoryPaths();
+
+            // Now process each project.
             foreach (var tuple in projectFileTuples)
             {
-                logger.LogInformation("Processing project ({projectCounter} / {projectCount}):\n\t{projectFile}",
+                textOutput.WriteInformation("Processing project ({projectCounter} / {projectCount}):\n\t{projectFile}",
                     projectCounter++,
                     projectCount,
                     tuple.ProjectFilePath);
@@ -658,7 +659,7 @@ namespace R5T.S0061.F001
                         tuple.ProjectFilePath,
                         "No assembly file.");
 
-                    logger.LogInformation("No assembly file to process, build failed.");
+                    textOutput.WriteInformation("No assembly file to process, build failed.");
 
                     continue;
                 }
@@ -742,11 +743,12 @@ namespace R5T.S0061.F001
                         tuple.ProjectFilePath,
                         tuple.AssemblyFilePath,
                         tuple.DocumentationFilePath,
-                        projectDependenciesSet);
+                        projectDependenciesSet,
+                        dotnetRuntimeDirectoryPaths);
 
                     instances.AddRange(currentInstances);
 
-                    logger.LogInformation("Processed project.");
+                    textOutput.WriteInformation("Processed project.");
                 }
                 catch (Exception ex)
                 {
@@ -766,8 +768,7 @@ namespace R5T.S0061.F001
             IList<string> projectFilePaths,
             string buildProblemsFilePath,
             string buildProblemProjectsFilePath,
-            HashSet<string> projectFilePathsToSkip,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var buildProblemTextsByProjectFilePath = new Dictionary<string, string>();
 
@@ -776,7 +777,7 @@ namespace R5T.S0061.F001
 
             foreach (var projectFilePath in projectFilePaths)
             {
-                logger.LogInformation("Building project ({projectCounter} / {projectCount}):\n\t{projectFilePath}",
+                textOutput.WriteInformation("Building project ({projectCounter} / {projectCount}):\n\t{projectFilePath}",
                     projectCounter++,
                     projectCount,
                     projectFilePath);
@@ -784,29 +785,18 @@ namespace R5T.S0061.F001
                 var shouldBuildProject = this.ShouldBuildProject(
                     projectFilePath,
                     rebuildFailedBuildsToCollectErrors,
-                    projectFilePathsToSkip,
-                    logger);
+                    textOutput);
 
                 if (shouldBuildProject)
                 {
                     // Clear the publish directory and publish (build), and not any problems.
                     await this.BuildProject(
                         projectFilePath,
-                        logger,
+                        textOutput,
                         buildProblemTextsByProjectFilePath);
                 }
                 else
                 {
-                    // Is project on the skip list?
-                    if(projectFilePathsToSkip.Contains(projectFilePath))
-                    {
-                        buildProblemTextsByProjectFilePath.Add(
-                            projectFilePath,
-                            "Project is on skip list.");
-
-                        continue;
-                    }
-
                     // See if a prior attempt to build the project failed, and not the failure.
                     var hasOutputAssembly = Instances.FileSystemOperator.Has_OutputAssembly(projectFilePath);
                     if (!hasOutputAssembly)
@@ -840,7 +830,7 @@ namespace R5T.S0061.F001
         /// </summary>
         public async Task BuildProject(
             string projectFilePath,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var publishDirectoryPath = Instances.DirectoryPathOperator.GetPublishDirectoryPath_ForProjectFilePath(projectFilePath);
 
@@ -859,23 +849,23 @@ namespace R5T.S0061.F001
                 projectFilePath,
                 publishDirectoryPath);
 
-            logger.LogInformation("Built project.");
+            textOutput.WriteInformation("Built project.");
         }
 
         public async Task BuildProject(
             string projectFilePath,
-            ILogger logger,
+            ITextOutput textOutput,
             Dictionary<string, string> buildProblemTextsByProjectFilePath)
         {
             try
             {
                 await this.BuildProject(
                     projectFilePath,
-                    logger);
+                    textOutput);
             }
             catch (AggregateException aggregateException)
             {
-                logger.LogWarning("Failed to build project.");
+                textOutput.WriteWarning_WithPause($"Failed to build project:\n\t{projectFilePath}");
 
                 // Combine aggregate exception messages to text.
                 var buildProblemText = Instances.TextOperator.JoinLines(
@@ -906,36 +896,28 @@ namespace R5T.S0061.F001
         public bool ShouldBuildProject(
             string projectFilePath,
             bool rebuildFailedBuildsToCollectErrors,
-            HashSet<string> projectFilePathsToSkip,
-            ILogger logger)
+            ITextOutput textOutput)
         {
-            logger.LogInformation("Determining whether the project should be built:\n\t{projectFilePath}", projectFilePath);
-
-            if(projectFilePathsToSkip.Contains(projectFilePath))
-            {
-                logger.LogInformation("Project is on skip list.");
-
-                return false;
-            }
+            textOutput.WriteInformation("Determining whether the project should be built:\n\t{projectFilePath}", projectFilePath);
 
             var neverBuiltBefore = this.ShouldBuildProject_NeverBuiltBefore(
                 projectFilePath,
-                logger);
+                textOutput);
 
             if (neverBuiltBefore)
             {
-                logger.LogInformation("Build project: never built (as part of this process).");
+                textOutput.WriteInformation("Build project: never built (as part of this process).");
 
                 return true;
             }
 
             var anyChangesSinceLastBuild = this.ShouldBuildProject_AnyChangesSinceLastBuild(
                 projectFilePath,
-                logger);
+                textOutput.Logger);
 
             if (anyChangesSinceLastBuild)
             {
-                logger.LogInformation("Build project: changes found since last build.");
+                textOutput.WriteInformation("Build project: changes found since last build.");
 
                 return true;
             }
@@ -945,19 +927,19 @@ namespace R5T.S0061.F001
             // If the output assembly was not found, we should re-build the project.
             var outputAssemblyNotFound = this.ShouldBuildProject_OutputAssemblyNotFound(
                 projectFilePath,
-                logger);
+                textOutput);
 
             // But only if we want to wait to rebuild projects for which prior build attempts have failed.
             var rebuildProjectAfterPriorFailedBuilds = outputAssemblyNotFound && rebuildFailedBuildsToCollectErrors;
 
             if (rebuildProjectAfterPriorFailedBuilds)
             {
-                logger.LogInformation("Build project: rebuild project after prior failure.");
+                textOutput.WriteInformation("Build project: rebuild project after prior failure.");
 
                 return true;
             }
 
-            logger.LogInformation("Do not build project.");
+            textOutput.WriteInformation("Do not build project.");
 
             return false;
         }
@@ -967,19 +949,19 @@ namespace R5T.S0061.F001
         /// </summary>
         public bool ShouldBuildProject_NeverBuiltBefore(
             string projectFilePath,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             // Determine whether the project has been built before as part of this process by testing for the existence of the output build file specific to this process.
             var hasBuildResultFile = Instances.FileSystemOperator.Has_BuildResultFile(projectFilePath);
 
             if (hasBuildResultFile)
             {
-                logger.LogInformation("Should not build: already built (as part of this process).");
+                textOutput.WriteInformation("Should not build: already built (as part of this process).");
                 return false;
             }
             else
             {
-                logger.LogInformation("Should build: never built (as part of this process).");
+                textOutput.WriteInformation("Should build: never built (as part of this process).");
                 return true;
             }
         }
@@ -989,17 +971,17 @@ namespace R5T.S0061.F001
         /// </summary>
         public bool ShouldBuildProject_OutputAssemblyNotFound(
             string projectFilePath,
-            ILogger logger)
+            ITextOutput textOutput)
         {
             var outputAssemblyExists = Instances.FileSystemOperator.Has_OutputAssembly(projectFilePath);
             if (outputAssemblyExists)
             {
-                logger.LogInformation("Should not build: output assembly already exists.");
+                textOutput.WriteInformation("Should not build: output assembly already exists.");
                 return false;
             }
             else
             {
-                logger.LogInformation("Should build: output assembly does not exist.");
+                textOutput.WriteInformation("Should build: output assembly does not exist.");
                 return true;
             }
         }
@@ -1049,15 +1031,16 @@ namespace R5T.S0061.F001
         }
 
         /// <summary>
-        /// Searches the file-system in each of the repositories directory paths.
+        /// <inheritdoc cref="Documentation.GetAllProjectFilePaths" path="/summary"/>
         /// Outputs the projects to a text file.
+        /// DOES NOT FILTER any projects.
         /// </summary>
-        public void GetAllProjectFilePaths(
+        public void GetAllProjectFilePaths_WithoutRemovingProjects(
             string outputTextFilePath,
             ILogger logger)
         {
             var projectFilePaths = this.GetAllProjectFilePaths(
-                logger);
+                logger.ToTextOutput());
 
             Instances.FileOperator.WriteLines_Synchronous(
                 outputTextFilePath,
@@ -1065,17 +1048,71 @@ namespace R5T.S0061.F001
         }
 
         /// <summary>
-        /// Searches the file-system in each of the repositories directory paths for projects.
+        /// <inheritdoc cref="Documentation.GetAllProjectFilePaths" path="/summary"/>
+        /// Also removes all projects that should not be built.
+        /// Outputs the projects to a text file.
+        /// </summary>
+        public void GetAllProjectFilePaths(
+            string allProjectsListTextFilePath,
+            string projectsOfInterestTextFilePath,
+            string doNotBuildProjectsListTextFilePath,
+            ITextOutput textOutput)
+        {
+            textOutput.WriteInformation("Searching for all project files...");
+
+            var allProjectFilePaths = this.GetAllProjectFilePaths(
+                textOutput);
+
+            textOutput.WriteInformation("Found {ProjectFileCount} project files.", allProjectFilePaths.Length);
+
+            // Write out all projects.
+            Instances.FileOperator.WriteLines_Synchronous(
+                allProjectsListTextFilePath,
+                allProjectFilePaths);
+
+            textOutput.WriteInformation("Wrote all project files to:\n\t{0}.", allProjectsListTextFilePath);
+
+            // Now filter out projects we don't want to built.
+            textOutput.WriteInformation("Filtering out project files that should not be built...");
+
+            textOutput.WriteInformation("Using do-not-build project files list from:\n\t{0}.", doNotBuildProjectsListTextFilePath);
+
+            var projectFilePathsToSkip = Instances.FileOperator.ReadAllLines_Synchronous(
+               doNotBuildProjectsListTextFilePath);
+
+            var projectFilePaths = allProjectFilePaths
+                .Except(projectFilePathsToSkip)
+                .Now();
+
+            textOutput.WriteInformation("After filtering {0} project files remain.", projectFilePaths.Length);
+
+            // Write out projects list we actually want to build.
+            Instances.FileOperator.WriteLines_Synchronous(
+                projectsOfInterestTextFilePath,
+                projectFilePaths);
+
+            textOutput.WriteInformation("Wrote project files to:\n\t{0}.", projectsOfInterestTextFilePath);
+        }
+
+        /// <summary>
+        /// <inheritdoc cref="Documentation.GetAllProjectFilePaths" path="/summary"/>
         /// </summary>
         public string[] GetAllProjectFilePaths(
-            ILogger logger)
+            ITextOutput textOutput)
         {
             // Output project paths to current run date's directory.
             var repositoriesDirectoryPaths = Instances.RepositoriesDirectoryPaths.AllOfMine;
 
+            // Write out the repositories directories to the human output.
+            textOutput.HumanOutput.WriteLine("Projects will be found in directories:");
+            foreach (var repositoriesDirectoryPath in repositoriesDirectoryPaths)
+            {
+                textOutput.HumanOutput.WriteLine($"\t{repositoriesDirectoryPath}");
+            }
+
             var projectFilePaths = Instances.FileSystemOperator.GetAllProjectFilePaths_FromRepositoriesDirectoryPaths(
                 repositoriesDirectoryPaths,
-                logger)
+                textOutput)
                 .OrderAlphabetically()
                 .Now();
 

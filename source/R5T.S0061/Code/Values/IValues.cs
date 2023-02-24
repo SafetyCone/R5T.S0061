@@ -9,6 +9,6 @@ namespace R5T.S0061
     public partial interface IValues : IValuesMarker,
         F001.IValues
     {
-        public string ApplicationName => "R5T.S0061";
+        public new string ApplicationName => "R5T.S0061";
     }
 }

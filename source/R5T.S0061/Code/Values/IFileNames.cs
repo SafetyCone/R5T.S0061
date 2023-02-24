@@ -22,7 +22,13 @@ namespace R5T.S0061
         public string ProcessingSummaryTextFileName => "Summary-Processing.txt";
         public string ProcessedProjectsTextFileName => "Processed Projects.txt";
         public string ProjectFileTuplesJsonFileName => "Project File Tuples.json";
+
+        /// <inheritdoc cref="F001.Documentation.ProjectsListTextFilePath"/>
         public string ProjectsListTextFileName => "Projects.txt";
+
+        /// <inheritdoc cref="F001.Documentation.ProjectsList_AllTextFilePath"/>
+        public string ProjectsList_AllTextFileName => "Projects-All.txt";
+
         public string SummaryTextFileName => "Summary.txt";
     }
 }

@@ -8,6 +8,19 @@ namespace R5T.S0061.F001
     [FunctionalityMarker]
     public partial interface IFilePathOperator : IFunctionalityMarker
     {
+        public string Get_PriorToDateFilePath(
+            string filePath,
+            DateTime date)
+        {
+            var priorToDateFilePath = Instances.PathOperator.AppendToFileNameStem(
+                filePath,
+                fileName => Instances.FileNameOperator.GetPriorToDateFileName(
+                    fileName,
+                    date));
+
+            return priorToDateFilePath;
+        }
+
         public string Get_BuildJsonFilePath(string projectFilePath)
         {
             var publishDirectoryPath = Instances.DirectoryPathOperator.GetPublishDirectoryPath_ForProjectFilePath(projectFilePath);

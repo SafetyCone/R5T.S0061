@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace R5T.S0061.T001
 {
+    /// <summary>
+    /// Full <see cref="InstanceDescriptor"/> equality comparer using all properties.
+    /// </summary>
     public class InstanceDescriptorEqualityComparer : IEqualityComparer<InstanceDescriptor>
     {
         #region Static

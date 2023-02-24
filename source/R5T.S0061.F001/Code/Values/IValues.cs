@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using R5T.F0000;
+
 using R5T.T0131;
 
 
@@ -9,6 +9,8 @@ namespace R5T.S0061.F001
     [ValuesMarker]
     public partial interface IValues : IValuesMarker
     {
+        public string ApplicationName => "R5T.S0061";
+
         /// <summary>
         /// Instance varieties for which we want the methods of the type.
         /// </summary>

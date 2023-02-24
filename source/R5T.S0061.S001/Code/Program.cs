@@ -8,21 +8,32 @@ namespace R5T.S0061.S001
     {
         static async Task Main()
         {
+            /// Main scripts.
             //Scripts.Instance.GetAllProjectFilePaths();
-            //await Scripts.Instance.BuildAllProjectFilePaths();
+            //await Scripts.Instance.BuildProjectFilePaths();
             //await Scripts.Instance.ProcessProjects();
+            //Scripts.Instance.CompareInstances();
+            //Scripts.Instance.UpdateInstancesFile();
+            Scripts.Instance.OutputInstancesToFilesAndOpen();
+
+            /// Search scripts.
+            //Scripts.Instance.SearchInstances_NameContainsText();
+            //Scripts.Instance.SearchFunctionality_NameContainsText_Categorize();
+
+            /// Miscellaneous scripts.
+            //Scripts.Instance.OpenInstanceFiles();
 
             //Scripts.Instance.SummarizeProcessingProblems();
 
             //Scripts.Instance.GetAllNuGetProjectFilePaths();
-            //Scripts.Instance.CleanDoNotBuildProjectsFile();
+            //Scripts.Instance.CleanDoNotBuildProjectsListTextFile();
             //Scripts.Instance.DeleteBinAndObjDirectories();
+            //await Scripts.Instance.BuildProjectFilePath();
             //await Scripts.Instance.ProcessProject();
-            //Scripts.Instance.SearchInstances_NameContainsText();
-            //Scripts.Instance.SearchFunctionality_NameContainsText_Categorize();
             //Scripts.Instance.ComputeProcessingProblemsThatAreNotBuildProblems();
 
-            Scripts.Instance.SummarizeInstances();
+            //Scripts.Instance.SummarizeInstances();
+
         }
     }
 }

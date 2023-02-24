@@ -17,7 +17,7 @@ namespace R5T.S0061.F001
         {
             var typeIdentityName = Instances.IdentityNameProvider.GetIdentityName(typeInfo);
 
-            var typeParameterNamedIdentityName = typeIdentityName; // Does not exist yet: Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(typeInfo);
+            var typeParameterNamedIdentityName = Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(typeInfo);
 
             var output = new InstanceIdentityNames
             {
