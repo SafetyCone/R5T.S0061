@@ -454,7 +454,7 @@ namespace R5T.S0061.S001
             var rebuildFailedBuildsToCollectErrors = true;
             var projectFilePaths =
             Instances.ArrayOperator.From(
-                @"C:\Code\DEV\Git\GitHub\SafetyCone\R5T.T0162\source\R5T.T0162\R5T.T0162.csproj")
+                @"C:\Code\DEV\Git\GitHub\davidcoats\D8S.W0004.Private\source\D8S.W0004\D8S.W0004.csproj")
             ;
 
 
