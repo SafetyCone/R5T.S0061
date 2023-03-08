@@ -33,7 +33,7 @@ namespace R5T.S0061.F001
             // Determine added instances: these are easy, it's just what instances exist in the "per-run" file that don't exist in the "prior-to" today file.
             var newInstances = runInstances.Except(
                 priorToTodayInstances,
-                InstanceDescriptorEqualityComparer.Instance)
+                T001.N002.InstanceDescriptorEqualityComparer.Instance)
                 .Now();
 
             // Determine removed instances: these are harder.
@@ -43,7 +43,7 @@ namespace R5T.S0061.F001
             // Whatever instances remain, those instances have actually been removed.
             var missingInstances = priorToTodayInstances.Except(
                 runInstances,
-                InstanceDescriptorEqualityComparer.Instance)
+                T001.N002.InstanceDescriptorEqualityComparer.Instance)
                 .Now();
 
             // Note: do not include "do not build" projects, since those instances should be visible forever (if they exist), as advertisements for processing those projects.

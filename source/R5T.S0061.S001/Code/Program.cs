@@ -14,7 +14,7 @@ namespace R5T.S0061.S001
             //await Scripts.Instance.ProcessProjects();
             //Scripts.Instance.CompareInstances();
             //Scripts.Instance.UpdateInstancesFile();
-            Scripts.Instance.OutputInstancesToFilesAndOpen();
+            //Scripts.Instance.OutputInstancesToFilesAndOpen();
 
             /// Search scripts.
             //Scripts.Instance.SearchInstances_NameContainsText();
