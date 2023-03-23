@@ -9,9 +9,9 @@ namespace R5T.S0061.S001
         static async Task Main()
         {
             /// Main scripts.
-            //Scripts.Instance.GetAllProjectFilePaths();
+            //Scripts.Instance.Find_AllProjectFilePaths();
             //await Scripts.Instance.BuildProjectFilePaths();
-            //await Scripts.Instance.ProcessProjects();
+            await Scripts.Instance.ProcessProjects();
             //Scripts.Instance.CompareInstances();
             //Scripts.Instance.UpdateInstancesFile();
             //Scripts.Instance.OutputInstancesToFilesAndOpen();

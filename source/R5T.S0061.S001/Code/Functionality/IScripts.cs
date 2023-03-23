@@ -484,7 +484,7 @@ namespace R5T.S0061.S001
         /// <inheritdoc cref="F001.Documentation.GetAllProjectFilePaths" path="/summary"/>
         /// Output all project file paths to <see cref="IFilePaths.ProjectsListTextFilePath"/>.
         /// </summary>
-        public void GetAllProjectFilePaths()
+        public void Find_AllProjectFilePaths()
         {
             /// Inputs.
             var projectsList_AllTextFilePath = Instances.FilePaths.ProjectsList_AllTextFilePath;
@@ -496,11 +496,11 @@ namespace R5T.S0061.S001
             var (humanOutputTextFilePath, _)
             = Instances.TextOutputOperator.InTextOutputContext_Synchronous(
                 Instances.HumanOutputTextFilePathOperator.GetHumanOutputTextFilePath,
-                nameof(GetAllProjectFilePaths),
+                nameof(Find_AllProjectFilePaths),
                 Instances.LogFilePathOperator.GetLogFilePath,
                 textOutput =>
                 {
-                    Instances.Operations.GetAllProjectFilePaths(
+                    Instances.Operations.Find_AllProjectFilePaths(
                         projectsList_AllTextFilePath,
                         projectsListTextFilePath,
                         doNotBuildProjectsListTextFilePath,
@@ -529,7 +529,7 @@ namespace R5T.S0061.S001
                     nameof(GetAllNuGetProjectFilePaths),
                     logger =>
                     {
-                        var projectFilePaths = Instances.Operations.GetAllProjectFilePaths(
+                        var projectFilePaths = Instances.Operations.Find_AllProjectFilePaths(
                             logger.ToTextOutput());
 
                         var nuGetProjectFilePaths = projectFilePaths

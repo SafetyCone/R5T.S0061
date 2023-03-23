@@ -7,7 +7,7 @@ namespace R5T.S0061
 {
 	[FunctionalityMarker]
 	public partial interface IInstanceVarietyOperator : IFunctionalityMarker,
-		F001.IInstancesVarietyOperator
+		F001.IInstanceVarietyOperator
 	{
 		public string GetInstanceVarietyName(string markerAttributeNamespacedTypeName)
         {

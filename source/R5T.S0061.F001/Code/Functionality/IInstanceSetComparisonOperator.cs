@@ -37,9 +37,9 @@ namespace R5T.S0061.F001
                 .Now();
 
             // Determine removed instances: these are harder.
-            //  First determine what instances exist in the "prior-to" today file that do not exist in the "per-run" file.
-            //  Then load the build problems and processing problems file paths.
-            //  For any instances that are in projects in either of the build problems or processing problems files, remove them from the list.
+            // First determine what instances exist in the "prior-to" today file that do not exist in the "per-run" file.
+            // Then load the build problems and processing problems file paths.
+            // For any instances that are in projects in either of the build problems or processing problems files, remove them from the list.
             // Whatever instances remain, those instances have actually been removed.
             var missingInstances = priorToTodayInstances.Except(
                 runInstances,

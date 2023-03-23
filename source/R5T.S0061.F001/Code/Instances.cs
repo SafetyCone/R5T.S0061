@@ -11,7 +11,10 @@ namespace R5T.S0061.F001
         public static IDirectoryNames DirectoryNames => F001.DirectoryNames.Instance;
         public static IDirectoryPathOperator DirectoryPathOperator => F001.DirectoryPathOperator.Instance;
         public static IDirectoryPaths DirectoryPaths => F001.DirectoryPaths.Instance;
-        public static F0099.IDocumentationOperations DocumentationOperations => F0099.DocumentationOperations.Instance;
+        /// <summary>
+        /// Use the stringly-typed operator.
+        /// </summary>
+        public static F0099.F001.IDocumentationOperations DocumentationOperations => F0099.F001.DocumentationOperations.Instance;
         //public static F0027.IDotnetPublishOperator DotnetPublishOperator => F0027.DotnetPublishOperator.Instance;
         public static F001.IDotnetMajorVersions DotnetMajorVersions => F001.DotnetMajorVersions.Instance;
         public static F0000.IEnumerableOperator EnumerableOperator => F0000.EnumerableOperator.Instance;

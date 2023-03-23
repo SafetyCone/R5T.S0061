@@ -29,11 +29,6 @@ namespace R5T.S0061.F001
         public static readonly object DoNotBuildProjectsListTextFilePath;
 
         /// <summary>
-        /// Find project files by searching repository directories on the local machine.
-        /// </summary>
-        public static readonly object GetAllProjectFilePaths;
-
-        /// <summary>
         /// The central source for what project file paths are of interest.
         /// The contents of this file have been filtered using the <see cref="DoNotBuildProjectsListTextFilePath"/> on the <see cref="ProjectsList_AllTextFilePath"/>.
         /// </summary>
@@ -51,13 +46,6 @@ namespace R5T.S0061.F001
         /// The contents of this file are filtered using the <see cref="DoNotBuildProjectsListTextFilePath"/> to get the <see cref="ProjectsListTextFilePath"/>.
         /// </summary>
         public static readonly object ProjectsList_AllTextFilePath;
-
-        /// <summary>
-        /// <inheritdoc cref="DotnetMajorRuntimeVersion" path="/definition"/>
-        /// </summary>
-        /// <definition>The .NET major runtime version (3.1, 5, 6, 7, etc.).</definition>
-        /// <name><i>major .NET runtime</i></name>
-        public static readonly object DotnetMajorRuntimeVersion;
 
         /// <summary>
         /// Contains all instances.

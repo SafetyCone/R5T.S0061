@@ -560,8 +560,8 @@ namespace R5T.S0061
             return (buildProblemsFilePath, buildProblemProjectsFilePath);
         }
 
+        ///// <inheritdoc cref="F001.Documentation."/>
         /// <summary>
-        /// <inheritdoc cref="F001.Documentation.GetAllProjectFilePaths"/>
         /// Also removes project files that should not be built.
         /// </summary>
         /// <returns>The projects list text file path.</returns>
@@ -582,7 +582,7 @@ namespace R5T.S0061
                     var projectsList_AllTextFilePath = Instances.FilePathOperator.Get_ProjectsList_AllTextFilePath(
                         datedOutputDirectoryPath);
 
-                    this.GetAllProjectFilePaths(
+                    this.Find_AllProjectFilePaths(
                         projectsList_AllTextFilePath,
                         projectsListTextFilePath,
                         Instances.FilePaths.DoNotBuildProjectsListTextFilePath,

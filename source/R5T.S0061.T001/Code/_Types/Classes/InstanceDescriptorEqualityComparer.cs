@@ -11,7 +11,7 @@ namespace R5T.S0061.T001
     {
         #region Static
 
-        public static InstanceDescriptorEqualityComparer Instance => new InstanceDescriptorEqualityComparer();
+        public static InstanceDescriptorEqualityComparer Instance { get; } = new InstanceDescriptorEqualityComparer();
 
         #endregion
 
@@ -23,7 +23,7 @@ namespace R5T.S0061.T001
                 && x.ProjectFilePath == y.ProjectFilePath
                 && x.ParameterNamedIdentityName == y.ParameterNamedIdentityName
                 && x.DescriptionXml == y.DescriptionXml
-                && x.IdentityName == y.IdentityName
+                && x.InstanceVariety == y.InstanceVariety
                 ;
 
             return output;
@@ -35,7 +35,7 @@ namespace R5T.S0061.T001
                 obj.InstanceVariety,
                 obj.ProjectFilePath,
                 // Use identity name, not parameter named identity name, since identity name will be unique in the project and the extra parameter name strings are just extra work.
-                obj.ParameterNamedIdentityName);
+                obj.IdentityName);
 
             // Skip description and parameter named identity name.
 
@@ -54,7 +54,7 @@ namespace R5T.S0061.T001.N002
     {
         #region Static
 
-        public static InstanceDescriptorEqualityComparer Instance => new InstanceDescriptorEqualityComparer();
+        public static InstanceDescriptorEqualityComparer Instance { get; } = new InstanceDescriptorEqualityComparer();
 
         #endregion
 
@@ -65,7 +65,7 @@ namespace R5T.S0061.T001.N002
                 && x.IdentityName == y.IdentityName
                 && x.ProjectFilePath == y.ProjectFilePath
                 && x.ParameterNamedIdentityName == y.ParameterNamedIdentityName
-                && x.IdentityName == y.IdentityName
+                && x.InstanceVariety == y.InstanceVariety
                 ;
 
             return output;
@@ -77,7 +77,7 @@ namespace R5T.S0061.T001.N002
                 obj.InstanceVariety,
                 obj.ProjectFilePath,
                 // Use identity name, not parameter named identity name, since identity name will be unique in the project and the extra parameter name strings are just extra work.
-                obj.ParameterNamedIdentityName);
+                obj.IdentityName);
 
             // Skip description and parameter named identity name.
 

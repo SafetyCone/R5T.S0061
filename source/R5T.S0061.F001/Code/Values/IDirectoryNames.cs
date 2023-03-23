@@ -7,8 +7,7 @@ namespace R5T.S0061.F001
 {
     [ValuesMarker]
     public partial interface IDirectoryNames : IValuesMarker,
-        Z0012.IDirectoryNames,
-        F0052.IDirectoryNames
+        F0112.IDirectoryNames
     { 
 
     }

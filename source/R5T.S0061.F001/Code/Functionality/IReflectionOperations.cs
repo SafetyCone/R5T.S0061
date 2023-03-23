@@ -30,14 +30,14 @@ namespace R5T.S0061.F001
 
         public InstanceIdentityNames GetValuePropertyNames(PropertyInfo propertyInfo)
         {
-            var methodIdentityName = Instances.IdentityNameProvider.GetIdentityName(propertyInfo);
+            var propertyIdentityName = Instances.IdentityNameProvider.GetIdentityName(propertyInfo);
 
-            var methodParameterNamedIdentityName = methodIdentityName; // TODO Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(methodInfo);
+            var propertyParameterNamedIdentityName = propertyIdentityName; // TODO Instances.ParameterNamedIdentityNameProvider.GetParameterNamedIdentityName(methodInfo);
 
             var output = new InstanceIdentityNames
             {
-                IdentityName = methodIdentityName,
-                ParameterNamedIdentityName = methodParameterNamedIdentityName,
+                IdentityName = propertyIdentityName,
+                ParameterNamedIdentityName = propertyParameterNamedIdentityName,
             };
 
             return output;
