@@ -11,14 +11,14 @@ namespace R5T.S0061.S001
             /// Main scripts.
             //Scripts.Instance.Find_AllProjectFilePaths();
             //await Scripts.Instance.BuildProjectFilePaths();
-            await Scripts.Instance.ProcessProjects();
+            //await Scripts.Instance.ProcessProjects();
             //Scripts.Instance.CompareInstances();
             //Scripts.Instance.UpdateInstancesFile();
             //Scripts.Instance.OutputInstancesToFilesAndOpen();
 
             /// Search scripts.
             //Scripts.Instance.SearchInstances_NameContainsText();
-            //Scripts.Instance.SearchFunctionality_NameContainsText_Categorize();
+            Scripts.Instance.SearchFunctionality_NameContainsText_Categorize();
 
             /// Miscellaneous scripts.
             //Scripts.Instance.OpenInstanceFiles();
