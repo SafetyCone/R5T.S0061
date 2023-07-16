@@ -117,7 +117,7 @@ namespace R5T.S0061
                     fileName);
 
                 var destinationFilePath = Instances.PathOperator.GetFilePath(
-                    Instances.DirectoryPaths.CloudSharedInstancesDirectoryPath,
+                    Instances.DirectoryPaths.CloudSharedInstancesDirectoryPath.Value,
                     fileName);
 
                 Instances.FileSystemOperator.CopyFile(

@@ -12,7 +12,7 @@ namespace R5T.S0061
         public string Get_ApplicationOutputDirectoryPath()
         {
             var datedOutputDirectoryPath = this.Get_ApplicationSpecificOutputDirectoryPath(
-                Instances.DirectoryPaths.CloudSharedOutputDirectoryPath,
+                Instances.DirectoryPaths.CloudSharedOutputDirectoryPath.Value,
                 Instances.Values.ApplicationName);
 
             return datedOutputDirectoryPath;
