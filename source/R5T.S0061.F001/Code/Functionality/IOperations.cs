@@ -595,7 +595,7 @@ namespace R5T.S0061.F001
                 processingProblemsTextFilePath,
                 processingProblemTextsByProjectFilePath);
 
-            Instances.FileOperator.WriteLines_Synchronous(
+            Instances.FileOperator.Write_Lines_Synchronous(
                 processingProblemProjectsTextFilePath,
                 processingProblemTextsByProjectFilePath.Keys
                     .OrderAlphabetically());
@@ -654,7 +654,7 @@ namespace R5T.S0061.F001
                     tuple.ProjectFilePath);
 
                 // Now test for whether the assembly file exists.
-                var assemblyFileExists = Instances.FileSystemOperator.FileExists(
+                var assemblyFileExists = Instances.FileSystemOperator.Exists_File(
                         tuple.AssemblyFilePath);
 
                 if (!assemblyFileExists)
@@ -768,7 +768,7 @@ namespace R5T.S0061.F001
         }
 
         /// <summary>
-        /// <inheritdoc cref="Documentation.GetAllProjectFilePaths" path="/summary"/>
+        /// <inheritdoc cref="Documentation.ProjectsListTextFilePath" path="/summary"/>
         /// Outputs the projects to a text file.
         /// DOES NOT FILTER any projects.
         /// </summary>
@@ -779,7 +779,7 @@ namespace R5T.S0061.F001
             var projectFilePaths = this.Find_AllProjectFilePaths(
                 logger.ToTextOutput());
 
-            Instances.FileOperator.WriteLines_Synchronous(
+            Instances.FileOperator.Write_Lines_Synchronous(
                 outputTextFilePath,
                 projectFilePaths);
         }

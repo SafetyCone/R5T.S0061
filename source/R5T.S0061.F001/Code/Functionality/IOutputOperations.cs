@@ -16,7 +16,7 @@ namespace R5T.S0061.F001
             string instancesJsonFilePath)
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -37,7 +37,7 @@ namespace R5T.S0061.F001
             {
                 var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-                var outputFilePath = Instances.PathOperator.GetFilePath(
+                var outputFilePath = Instances.PathOperator.Get_FilePath(
                     datedOutputDirectoryPath,
                     fileName);
 
@@ -53,11 +53,11 @@ namespace R5T.S0061.F001
                 var lines = Instances.EnumerableOperator.From($"{title}, Count: {instancesOfVariety.Length}\n\n")
                     .Append(instancesOfVariety
                         .GroupBy(x => x.ProjectFilePath)
-                        .OrderAlphabetically(x => x.Key)
+                        .OrderAlphabeticallyBy(x => x.Key)
                         .SelectMany(xGroup => Instances.EnumerableOperator.From($"{xGroup.Key}:")
                             .Append(xGroup
                                 // Order by the identity name.
-                                .OrderAlphabetically(x => x.IdentityName)
+                                .OrderAlphabeticallyBy(x => x.IdentityName)
                                 // But output the parameter named identity name.
                                 .Select(x => $"\t{x.ParameterNamedIdentityName}")
                                 .Append(Instances.Strings.Empty))));

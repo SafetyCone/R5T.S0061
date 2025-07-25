@@ -42,8 +42,8 @@ namespace R5T.S0061.F001
         /// </summary>
         public Dictionary<string, string> InstanceTypeMarkerAttributeNamespacedTypeNamesByVarietyName => new Dictionary<string, string>()
         {
-            { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
-            { Instances.InstanceVariety.DraftMarkerAttribute, F0000.Instances.TypeOperator.GetNamespacedTypeName<T0143.DraftMarkerAttributeMarkerAttribute>() },
+            { Instances.InstanceVariety.MarkerAttribute, F0000.Instances.TypeOperator.Get_NamespacedTypeName<T0143.MarkerAttributeMarkerAttribute>() },
+            { Instances.InstanceVariety.DraftMarkerAttribute, F0000.Instances.TypeOperator.Get_NamespacedTypeName<T0143.DraftMarkerAttributeMarkerAttribute>() },
             { Instances.InstanceVariety.ContextDefinition, Instances.NamespacedTypeNames.ContextDefinitionMarkerAttribute },
             { Instances.InstanceVariety.ContextImplementation, Instances.NamespacedTypeNames.ContextImplementationMarkerAttribute },
             { Instances.InstanceVariety.ContextType, Instances.NamespacedTypeNames.ContextTypeMarkerAttribute },

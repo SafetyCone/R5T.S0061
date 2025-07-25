@@ -17,7 +17,7 @@ namespace R5T.S0061.S001
         public void OpenInstanceFiles()
         {
             /// Inputs.
-            var date = Instances.NowOperator.GetToday();
+            var date = Instances.NowOperator.Get_Today();
 
 
             /// Run.
@@ -30,7 +30,7 @@ namespace R5T.S0061.S001
                 {
                     var fileName = Instances.FileNameOperator.GetTextOutputFileName_ForInstanceVariety(instanceVarietyName);
 
-                    var outputFilePath = Instances.PathOperator.GetFilePath(
+                    var outputFilePath = Instances.PathOperator.Get_FilePath(
                         datedOutputDirectoryPath,
                         fileName);
 
@@ -105,10 +105,10 @@ namespace R5T.S0061.S001
                 today);
 
             // If a "prior-to" instances file for today's date does not exist, create it by copying the instances file to the "prior-to" today's date instances file path.
-            var priorToTodayInstancesFileExists = Instances.FileSystemOperator.FileExists(priorToTodayInstancesFilePath);
+            var priorToTodayInstancesFileExists = Instances.FileSystemOperator.Exists_File(priorToTodayInstancesFilePath);
             if(!priorToTodayInstancesFileExists)
             {
-                Instances.FileSystemOperator.CopyFile(
+                Instances.FileSystemOperator.Copy_File(
                     Instances.FilePaths.InstancesJsonFilePath,
                     priorToTodayInstancesFilePath);
             }
@@ -308,7 +308,7 @@ namespace R5T.S0061.S001
                     .AppendRange(x.Value.Select(y => $"\t{y}")))
                 .Now();
 
-            Instances.FileOperator.WriteLines_Synchronous(
+            Instances.FileOperator.Write_Lines_Synchronous(
                 Instances.FilePaths.OutputTextFilePath,
                 outputLines);
 
@@ -536,7 +536,7 @@ namespace R5T.S0061.S001
                             .Where(projectFilePath => projectFilePath.Contains("_NuGet"))
                             .Now();
 
-                        Instances.FileOperator.WriteLines_Synchronous(
+                        Instances.FileOperator.Write_Lines_Synchronous(
                             outputTextFilePath,
                             nuGetProjectFilePaths);
                     });
@@ -559,7 +559,7 @@ namespace R5T.S0061.S001
                 .OrderAlphabetically()
                 .Now();
 
-            Instances.FileOperator.WriteLines_Synchronous(
+            Instances.FileOperator.Write_Lines_Synchronous(
                 filePath,
                 cleanedProjectFilePaths);
 
@@ -574,16 +574,16 @@ namespace R5T.S0061.S001
 
             foreach (var projectFilePath in projectFilePaths)
             {
-                var projectDirectoryPath = Instances.PathOperator.GetFileParentDirectoryPath(projectFilePath);
-                var binDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+                var projectDirectoryPath = Instances.PathOperator.Get_ParentDirectoryPath_ForFile(projectFilePath);
+                var binDirectoryPath = Instances.PathOperator.Get_DirectoryPath(
                     projectDirectoryPath,
                     "bin");
-                var objDirectoryPath = Instances.PathOperator.GetDirectoryPath(
+                var objDirectoryPath = Instances.PathOperator.Get_DirectoryPath(
                     projectDirectoryPath,
                     "obj");
 
-                Instances.FileSystemOperator.DeleteDirectory_Idempotent(binDirectoryPath);
-                Instances.FileSystemOperator.DeleteDirectory_Idempotent(objDirectoryPath);
+                Instances.FileSystemOperator.Delete_Directory_Idempotent(binDirectoryPath);
+                Instances.FileSystemOperator.Delete_Directory_Idempotent(objDirectoryPath);
             }
         }
 

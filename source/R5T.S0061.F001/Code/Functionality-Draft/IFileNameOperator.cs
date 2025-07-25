@@ -20,7 +20,7 @@ namespace R5T.S0061.F001
         {
             var fileNameStem = this.GetOutputFileNameStem_ForInstanceVariety(instanceVarietyName);
 
-            var output = this.GetFileName(
+            var output = this.Get_FileName(
                 fileNameStem,
                 Instances.FileExtensions.Text);
 
@@ -35,7 +35,7 @@ namespace R5T.S0061.F001
 
             var appendix = $"-Prior to-{yyyyMMdd}";
 
-            var newFileName = this.AppendToFileNameStem(
+            var newFileName = this.Append_ToFileNameStem(
                 fileName,
                 appendix);
 

@@ -18,7 +18,7 @@ namespace R5T.S0061.F001
         //public static F0027.IDotnetPublishOperator DotnetPublishOperator => F0027.DotnetPublishOperator.Instance;
         public static F001.IDotnetMajorVersions DotnetMajorVersions => F001.DotnetMajorVersions.Instance;
         public static F0000.IEnumerableOperator EnumerableOperator => F0000.EnumerableOperator.Instance;
-        public static Z0010.IFileExtensions FileExtensions => Z0010.FileExtensions.Instance;
+        public static L0066.IFileExtensions FileExtensions => L0066.FileExtensions.Instance;
         public static IFileNameOperator FileNameOperator => F001.FileNameOperator.Instance;
         public static IFileNames FileNames => F001.FileNames.Instance;
         public static F0000.IFileOperator FileOperator => F0000.FileOperator.Instance;
